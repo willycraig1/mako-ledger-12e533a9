@@ -35,7 +35,8 @@
 
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--f-body);padding-inline:16px;padding-block:24px 64px}
-.wrap{max-width:1080px;margin:0 auto;display:grid;gap:28px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+.wrap>*{min-width:0}
 h1,h2,h3{margin:0;text-wrap:balance}
 h2{font:800 1.7rem/1 var(--f-display);letter-spacing:.01em;text-transform:uppercase}
 .eyebrow{font:500 .72rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -84,7 +85,7 @@ section>header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:
 @media (max-width:860px){.two{grid-template-columns:1fr}}
 .slider{display:grid;gap:8px;margin:4px 0 18px}
 .slider-row{display:flex;justify-content:space-between;font-weight:600}
-input[type=range]{width:100%;accent-color:var(--sea)}
+input[type=range]{width:100%;margin:0;accent-color:var(--sea)}
 .fam{display:grid;gap:14px}
 .famrow{display:grid;gap:6px}
 .famhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
@@ -144,6 +145,43 @@ select:focus-visible,input:focus-visible,button:focus-visible,.rtitle:focus-visi
 .line .track{height:10px;background:var(--soft);border-radius:2px;overflow:hidden}
 .line .fill{height:100%;background:var(--sea)}
 .detailrow td{background:var(--paper)}
+.splittext{font-size:.86rem;white-space:nowrap}
+
+/* phones: tables become stacked cards */
+@media (max-width:640px){
+  body{padding-block:16px 48px}
+  .wrap{gap:22px}
+  .card{padding:16px}
+  .tablewrap{overflow:visible}
+  table{min-width:0}
+  thead{display:none}
+  tbody,tr,td{display:block}
+  #ledger tr:not(.detailrow),#payments tr{display:grid;gap:4px 12px;padding:14px;border-bottom:1px solid var(--line)}
+  #ledger tr:last-child,#payments tr:last-child{border-bottom:0}
+  td{padding:0;border:0;min-width:0}
+  td.r{text-align:right}
+  td:empty{display:none}
+  #ledger tr:not(.detailrow){grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;grid-template-areas:"what what amt" "date billed billed" "split cr el"}
+  .c-what{grid-area:what}.c-amt{grid-area:amt;font-weight:600}.c-date{grid-area:date}.c-billed{grid-area:billed;text-align:right}
+  .c-split{grid-area:split}.c-cr{grid-area:cr}.c-el{grid-area:el}
+  .c-date,.c-billed,.c-split{font-size:.82rem;color:var(--muted)}
+  .c-cr,.c-el{font-size:.86rem}
+  .c-cr::before,.c-el::before{display:block;font:500 .62rem/1.4 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .c-cr::before{content:"Craigs";color:var(--craig)}.c-el::before{content:"Ellsworths";color:var(--ells)}
+  .c-split{align-self:end}
+  .rsub{margin-bottom:4px}
+  .detailrow td:first-child{display:none}
+  .detailrow td{padding:4px 14px 14px;border-bottom:1px solid var(--line)}
+  .line{grid-template-columns:minmax(0,1fr) 84px;row-gap:3px}
+  .line>span:first-child{grid-column:1/-1}
+  #payments tr{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"for amt" "date who"}
+  .p-for{grid-area:for}.p-amt{grid-area:amt;font-weight:600}.p-date{grid-area:date;font-size:.82rem;color:var(--muted)}.p-who{grid-area:who;text-align:right}
+  .empty{padding:20px}
+  .draws li{grid-template-columns:56px 1fr auto;gap:10px}
+  .tl li{grid-template-columns:62px 1fr;gap:10px}
+  .tl li::before{left:68px}
+  .tiles .big{font-size:2.1rem}
+}
 
 /* story + horizon */
 .story{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
@@ -465,22 +503,22 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
     else $('ledger').innerHTML=k.costs.map(c=>{
       const [a,b]=shares(c); const has=c.lines&&c.lines.length; const open=S.open.has(c.id);
       const sel=`<select data-split="${esc(c.id)}" aria-label="Split for ${esc(c.title)}" ${S.canWrite?'':'disabled'}>${Object.entries(SPLIT).map(([v,l])=>`<option value="${v}" ${c.split===v?'selected':''}>${l}</option>`).join('')}</select>`;
-      let row=`<tr><td class="num">${fmtDate(c.date)}</td>
-        <td><button class="rtitle" data-toggle="${esc(c.id)}" aria-expanded="${open}" ${has?'':'disabled'}>${esc(c.title)}</button><span class="rsub">${esc(c.detail||'')}</span>
+      let row=`<tr><td class="num c-date">${fmtDate(c.date)}</td>
+        <td class="c-what"><button class="rtitle" data-toggle="${esc(c.id)}" aria-expanded="${open}" ${has?'':'disabled'}>${esc(c.title)}</button><span class="rsub">${esc(c.detail||'')}</span>
           ${c.virtual?'<span class="chip auto">Auto from contract</span>':''} ${c.category==='nonboat'?'<span class="chip ells">Not a boat cost</span>':''} ${c.flag?`<span class="chip warn">${esc(c.flag)}</span>`:''}</td>
-        <td>${esc(c.billedTo||'')}</td><td>${sel}</td>
-        <td class="r num">${money(c.amount)}</td><td class="r num">${money(a)}</td><td class="r num">${money(b)}</td>
-        <td>${c.virtual||!S.canWrite?'':`<button class="btn ghost" data-del="costs/${esc(c.id)}">Remove</button>`}</td></tr>`;
+        <td class="c-billed">${esc(c.billedTo||'')}</td><td class="c-split">${S.canWrite?sel:`<span class="splittext">${SPLIT[c.split]||'Shared'}${c.split==='shared'?` ${S.config.craigPct}/${100-S.config.craigPct}`:''}</span>`}</td>
+        <td class="r num c-amt">${money(c.amount)}</td><td class="r num c-cr">${money(a)}</td><td class="r num c-el">${money(b)}</td>
+        <td class="c-act">${c.virtual||!S.canWrite?'':`<button class="btn ghost" data-del="costs/${esc(c.id)}">Remove</button>`}</td></tr>`;
       if(has&&open){const lm=Math.max(...c.lines.map(l=>l.amount));
         row+=`<tr class="detailrow"><td></td><td colspan="7"><div class="lines">${c.lines.map(l=>`<div class="line"><span>${esc(l.label)}</span><div class="track"><div class="fill" style="width:${l.amount/lm*100}%"></div></div><span class="num" style="text-align:right">${money(l.amount)}</span></div>`).join('')}</div></td></tr>`;}
       return row;}).join('');
 
     // payments
     const pays=[...S.payments].sort((a,b)=>b.date.localeCompare(a.date));
-    let pr=pays.map(p=>`<tr><td class="num">${fmtDate(p.date)}</td><td><span class="chip ${p.payer==='craig'?'craig':'ells'}">${p.payer==='craig'?'Craigs':'Ellsworths'}</span></td>
-      <td>${esc(p.note||'')} ${p.flag?`<span class="chip warn">${esc(p.flag)}</span>`:''}</td><td class="r num">${money(p.amount)}</td>
-      <td>${S.canWrite?`<button class="btn ghost" data-del="payments/${esc(p.id)}">Remove</button>`:''}</td></tr>`).join('');
-    if(k.st.length) pr+=`<tr><td class="num">Expected</td><td><span class="chip craig">Craigs</span></td><td>Storage ACH × ${k.st.length}, not recorded yet <span class="chip auto">Auto from contract</span> <span class="chip warn">Record actual draft</span></td><td class="r num">${money(k.st.reduce((s,c)=>s+c.amount,0))}</td><td></td></tr>`;
+    let pr=pays.map(p=>`<tr><td class="num p-date">${fmtDate(p.date)}</td><td class="p-who"><span class="chip ${p.payer==='craig'?'craig':'ells'}">${p.payer==='craig'?'Craigs':'Ellsworths'}</span></td>
+      <td class="p-for">${esc(p.note||'')} ${p.flag?`<span class="chip warn">${esc(p.flag)}</span>`:''}</td><td class="r num p-amt">${money(p.amount)}</td>
+      <td class="p-act">${S.canWrite?`<button class="btn ghost" data-del="payments/${esc(p.id)}">Remove</button>`:''}</td></tr>`).join('');
+    if(k.st.length) pr+=`<tr><td class="num p-date">Expected</td><td class="p-who"><span class="chip craig">Craigs</span></td><td class="p-for">Storage ACH × ${k.st.length}, not recorded yet <span class="chip auto">Auto from contract</span> <span class="chip warn">Record actual draft</span></td><td class="r num p-amt">${money(k.st.reduce((s,c)=>s+c.amount,0))}</td><td class="p-act"></td></tr>`;
     $('payments').innerHTML=pr||`<tr><td colspan="5" class="empty">No payments recorded yet.</td></tr>`;
   }
 
