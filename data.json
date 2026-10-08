@@ -1,0 +1,204 @@
+{
+  "updated": "2026-10-08",
+  "config": {
+    "craigPct": 50,
+    "drawDay": 10,
+    "pendingStatement": 2920.77,
+    "storageMonthly": 325.28,
+    "storageSplit": "shared",
+    "storageStart": "2026-08"
+  },
+  "costs": [
+    {
+      "id": "allstate-2026",
+      "amount": 520.54,
+      "billedTo": "Kent's Allstate policy",
+      "category": "insurance",
+      "date": "2026-07-30",
+      "detail": "Policy 991483154 · full-term premium (rates as of Jan 4, 2026)",
+      "flag": "Confirm term",
+      "split": "shared",
+      "title": "Allstate boat insurance"
+    },
+    {
+      "id": "storage-2026-08",
+      "amount": 325.28,
+      "billedTo": "Craig BofA (ACH)",
+      "category": "storage",
+      "date": "2026-08-11",
+      "detail": "$304.00 + $21.28 FL sales tax · ACH draft",
+      "month": "2026-08",
+      "split": "shared",
+      "title": "Outside storage · Aug 2026"
+    },
+    {
+      "id": "wo-523845",
+      "amount": 3042.75,
+      "billedTo": "Kent's marina acct",
+      "category": "service",
+      "date": "2026-08-21",
+      "detail": "Invoices 983586 ($2,385.77, Aug 13) + 983701 ($656.98, Aug 21)",
+      "flag": "Unpaid · 30+ days",
+      "lines": [
+        {
+          "amount": 964.92,
+          "label": "Hatch latches & hardware"
+        },
+        {
+          "amount": 536.94,
+          "label": "Livewell pump + seacock"
+        },
+        {
+          "amount": 500,
+          "label": "New white vinyl T-top (sublet)"
+        },
+        {
+          "amount": 478.83,
+          "label": "Oil, filters, gear lube (23.4 hrs)"
+        },
+        {
+          "amount": 149.25,
+          "label": "Nav lights wire repair"
+        },
+        {
+          "amount": 121.98,
+          "label": "Gasoline, 20 gal"
+        },
+        {
+          "amount": 49.75,
+          "label": "VHF antenna mount"
+        },
+        {
+          "amount": 50,
+          "label": "Shop charges"
+        },
+        {
+          "amount": 191.08,
+          "label": "FL sales tax + Manatee surtax"
+        }
+      ],
+      "split": "shared",
+      "title": "WO 523845 · August service & repairs"
+    },
+    {
+      "id": "wo-523952",
+      "amount": 293.48,
+      "billedTo": "Kent's marina acct",
+      "category": "service",
+      "date": "2026-09-03",
+      "detail": "Invoice 983955 · line items not in our files",
+      "split": "shared",
+      "title": "WO 523952"
+    },
+    {
+      "id": "ice-2026-09",
+      "amount": 5.5,
+      "billedTo": "Craig BofA (ACH)",
+      "category": "other",
+      "date": "2026-09-10",
+      "detail": "Added to the September ACH draft",
+      "split": "craig",
+      "title": "Ice · 2 bags"
+    },
+    {
+      "id": "storage-2026-09",
+      "amount": 325.28,
+      "billedTo": "Craig BofA (ACH)",
+      "category": "storage",
+      "date": "2026-09-10",
+      "detail": "$304.00 + $21.28 FL sales tax · ACH draft (same draft as the ice)",
+      "month": "2026-09",
+      "split": "shared",
+      "title": "Outside storage · Sep 2026"
+    },
+    {
+      "id": "wo-523987",
+      "amount": 3993.43,
+      "billedTo": "Kent's marina acct",
+      "category": "upgrade",
+      "date": "2026-10-07",
+      "detail": "Invoices: earlier $2,346.16 (not in our files) + 984493 ($1,647.27) · WO still marked incomplete",
+      "flag": "Unpaid",
+      "lines": [
+        {
+          "amount": 1949.99,
+          "label": "Power-Pole 6 ft, black"
+        },
+        {
+          "amount": 895.5,
+          "label": "Power-Pole install labor (4.5 hrs)"
+        },
+        {
+          "amount": 594,
+          "label": "Mercury gateway + NMEA labor (5.5 of 8.75 hrs)"
+        },
+        {
+          "amount": 222.1,
+          "label": "Mercury gateway, J-box, harnesses, terminator"
+        },
+        {
+          "amount": 22.02,
+          "label": "Freight (Power-Pole)"
+        },
+        {
+          "amount": 50,
+          "label": "Shop charges"
+        },
+        {
+          "amount": 259.82,
+          "label": "FL sales tax + Manatee surtax"
+        }
+      ],
+      "split": "shared",
+      "title": "WO 523987 · Power-Pole + Simrad fuel/engine data"
+    },
+    {
+      "id": "maybel-surgery",
+      "amount": 1500,
+      "billedTo": "Paid by the Ellsworths",
+      "category": "nonboat",
+      "date": "2026-10-08",
+      "detail": "Ellsworths paid this for us · credited to them in the split",
+      "split": "craig",
+      "title": "Maybel's surgery"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-allstate-2026",
+      "amount": 520.54,
+      "date": "2026-07-30",
+      "note": "Allstate premium · paid",
+      "payer": "ellsworth"
+    },
+    {
+      "id": "ach-2026-08-11",
+      "amount": 325.28,
+      "date": "2026-08-11",
+      "note": "Storage ACH · August",
+      "payer": "craig"
+    },
+    {
+      "id": "pay-2026-09-08",
+      "amount": 415.46,
+      "date": "2026-09-08",
+      "flag": "Assumed Ellsworths",
+      "note": "Marina ref 984026 · WO 523952 + $121.98 gas",
+      "payer": "ellsworth"
+    },
+    {
+      "id": "ach-2026-09-10",
+      "amount": 330.78,
+      "date": "2026-09-10",
+      "note": "Storage ACH · September + 2 bags of ice",
+      "payer": "craig"
+    },
+    {
+      "id": "maybel-surgery",
+      "amount": 1500,
+      "date": "2026-10-08",
+      "note": "Maybel's surgery, paid on the Craigs' behalf",
+      "payer": "ellsworth"
+    }
+  ]
+}
