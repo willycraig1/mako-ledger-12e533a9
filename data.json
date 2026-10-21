@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-08",
+  "updated": "2026-10-21",
   "config": {
     "craigPct": 50,
     "drawDay": 10,
@@ -161,6 +161,19 @@
       "detail": "Ellsworths paid this for us · credited to them in the split",
       "split": "craig",
       "title": "Maybel's surgery"
+    },
+    {
+      "id": "storage-2026-10",
+      "month": "2026-10",
+      "date": "2026-10-10",
+      "title": "Outside storage · Oct 2026",
+      "detail": "$304.00 + $21.28 FL sales tax · ACH draft expected ~Oct 10, not taken as of Oct 21",
+      "flag": "Not drafted yet",
+      "undrawn": true,
+      "category": "storage",
+      "amount": 325.28,
+      "billedTo": "Craig BofA (ACH)",
+      "split": "shared"
     }
   ],
   "payments": [

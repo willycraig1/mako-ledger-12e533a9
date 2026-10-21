@@ -332,6 +332,7 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
         <li><time>Sep 24</time><p>Work order 523987 opened: Power-Pole install and Simrad fuel/engine data.</p></li>
         <li><time>Oct 1</time><p>Statement: <b class="num">$2,920.77</b> due, all of it in the 30-day column.</p></li>
         <li><time>Oct 5–7</time><p>6 ft black Power-Pole installed. Mercury gateway and NMEA backbone added so the Simrad reads fuel and engine data. WO 523987 totals <b class="num">$3,993.43</b>, with 3.25 hrs of labor not charged.</p></li>
+        <li><time>Oct 10</time><p>Expected October storage draft doesn't arrive. Still not taken by Oct 21.</p></li>
       </ol>
     </section>
     <section class="card">
@@ -342,7 +343,7 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
         <li><b>Analog fuel gauge is now dead</b><span>The fuel sender accepts one lead, and it now feeds the Simrad. The dash gauge wire is tied back. Fuel level reads on the Simrad only.</span></li>
         <li><b>Simrad boat speed</b><span>Probably a free settings fix: switch the field from Boat Speed to SOG.</span></li>
         <li><b>Mesh stowage bag</b><span>The marina couldn't source it, so it's on us to find a replacement.</span></li>
-        <li class="hot"><b>October draft, around the 10th</b><span>Might include Kent's $2,920.77 Oct 1 statement balance on top of storage. WO 523987 came after that statement, so it will likely land on the November one. If it does, record it as a Craig payment and the split updates.</span></li>
+        <li class="hot"><b>October storage hasn't been drafted</b><span>Nothing had come out of BofA as of Oct 21. Call the office to confirm the ACH is still on file and that no late fee will be added, since the contract makes us responsible for paying on time. The next draft could be $650.56 (Oct + Nov), possibly with Kent's balance too.</span></li>
         <li><b>$500 deposit</b><span>The contract calls for a refundable $500 deposit, but none has been taken. It may have been waived or forgotten, so it could still show up on a draft.</span></li>
         <li><b>Insurance renewal</b><span>The Ellsworths pay the Mako's Allstate premium ($520.54, policy 991483154). This term is paid.</span></li>
       </ul>
@@ -445,7 +446,8 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
     let total=0,boat=0,sc=0,se=0; costs.forEach(c=>{total+=c.amount;if(c.category!=='nonboat')boat+=c.amount;const[a,b]=shares(c);sc+=a;se+=b;});
     let pc=st.reduce((s,c)=>s+c.amount,0), pe=0;
     S.payments.forEach(p=>{if(p.payer==='craig')pc+=p.amount;else pe+=p.amount;});
-    return {costs,st,boat:r2(boat),total:r2(total),sc:r2(sc),se:r2(se),pc:r2(pc),pe:r2(pe),open:r2(total-pc-pe)};
+    const late=costs.filter(c=>c.undrawn); const undrawn=r2(late.reduce((t,c)=>t+c.amount,0));
+    return {costs,st,late,undrawn,boat:r2(boat),total:r2(total),sc:r2(sc),se:r2(se),pc:r2(pc),pe:r2(pe),open:r2(total-pc-pe)};
   }
 
   function render(){
@@ -459,11 +461,11 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
     $('tOpen').textContent=money(Math.max(k.open,0));
     const aged=k.open>0.005;
     $('tOpenTile').classList.toggle('alert',aged);
-    $('tOpenSub').textContent=aged?'On Kent\'s marina account. Part of it was past 30 days on the Oct 1 statement, so late fees and interest can apply.':'Nothing outstanding.';
+    $('tOpenSub').textContent=!aged?'Nothing outstanding.':(k.undrawn>0.005?`${money(k.open-k.undrawn)} on Kent's marina account, plus ${money(k.undrawn)} of storage the marina hasn't drafted yet. Late fees and interest can apply.`:'On Kent\'s marina account. Part of it was past 30 days on the Oct 1 statement, so late fees and interest can apply.');
     const dd=S.config.drawDay||10;
     const nx=today.getDate()<dd?new Date(today.getFullYear(),today.getMonth(),dd):new Date(today.getFullYear(),today.getMonth()+1,dd);
-    $('tNext').textContent=money(S.config.storageMonthly);
-    $('tNextSub').textContent=`About ${MONTHS[nx.getMonth()]} ${dd} · storage ACH, Bank of America`+(S.config.pendingStatement>0.005?`. Could also include the ${money(S.config.pendingStatement)} statement balance.`:'');
+    $('tNext').textContent=money(k.undrawn>0.005?k.undrawn:S.config.storageMonthly);
+    $('tNextSub').textContent=k.undrawn>0.005?`${k.late.map(c=>MONTHS[+c.month.split('-')[1]-1]).join(' + ')} storage, overdue. Could come any day, or together with ${MONTHS[nx.getMonth()]}'s on ${MONTHS[nx.getMonth()]} ${dd}.`:`About ${MONTHS[nx.getMonth()]} ${dd} · storage ACH, Bank of America`+(S.config.pendingStatement>0.005?`. Could also include the ${money(S.config.pendingStatement)} statement balance.`:'');
 
     // family split
     const fam=[['craig','Craigs',k.sc,k.pc,'var(--craig)'],['ellsworth','Ellsworths',k.se,k.pe,'var(--ells)']];
@@ -487,6 +489,8 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
 
     // draws
     let dl='';
+    k.late.forEach(c=>{const mm=MONTHS[+c.month.split('-')[1]-1];
+      dl+=`<li class="oneoff"><div class="cal"><i>${mm}</i><b>Late</b></div><div class="what">${mm} storage, not drafted yet<small>Was due around ${mm} ${dd}. Watch for it, possibly combined with the next draft.</small></div><span class="num">${money(c.amount)}</span></li>`;});
     for(let i=0;i<6;i++){const d=new Date(nx.getFullYear(),nx.getMonth()+i,dd);
       if(i===0 && S.config.pendingStatement>0.005) dl+=`<li class="oneoff"><div class="cal"><i>${MONTHS[d.getMonth()]}</i><b>${dd}?</b></div><div class="what">Possible: Kent's Oct 1 statement balance<small>If the marina adds it to this draft, record it as a Craig payment. The split will then show what the Ellsworths owe back.</small></div><span class="num">${money(S.config.pendingStatement)}</span></li>`;
       dl+=`<li><div class="cal"><i>${MONTHS[d.getMonth()]}</i><b>${dd}</b></div><div class="what">Outside storage<small>$304.00 + $21.28 tax · ${S.config.storageSplit==='shared'?`Ellsworth half ${money(S.config.storageMonthly*(100-S.config.craigPct)/100)}`:SPLIT[S.config.storageSplit||'shared']}</small></div><span class="num">${money(S.config.storageMonthly)}</span></li>`;}
