@@ -3,7 +3,7 @@
   "config": {
     "craigPct": 50,
     "drawDay": 10,
-    "pendingStatement": 2920.77,
+    "pendingStatement": 0,
     "storageMonthly": 325.28,
     "storageSplit": "shared",
     "storageStart": "2026-08"
@@ -38,7 +38,6 @@
       "category": "service",
       "date": "2026-08-21",
       "detail": "Invoices 983586 ($2,385.77, Aug 13) + 983701 ($656.98, Aug 21)",
-      "flag": "Unpaid · 30+ days",
       "lines": [
         {
           "amount": 964.92,
@@ -118,7 +117,6 @@
       "category": "upgrade",
       "date": "2026-10-07",
       "detail": "Invoices: earlier $2,346.16 (not in our files) + 984493 ($1,647.27) · WO still marked incomplete",
-      "flag": "Unpaid",
       "lines": [
         {
           "amount": 1949.99,
@@ -174,6 +172,17 @@
       "amount": 325.28,
       "billedTo": "Craig BofA (ACH)",
       "split": "shared"
+    },
+    {
+      "id": "card-fee-2026-10-21",
+      "date": "2026-10-21",
+      "title": "Card processing fee",
+      "detail": "Oct 21 payment link · $138.28 = 2% of the $6,914.20 balance · itemized receipt not received yet",
+      "flag": "Breakdown pending",
+      "category": "fees",
+      "amount": 138.28,
+      "billedTo": "Kent's marina acct (paid by card)",
+      "split": "shared"
     }
   ],
   "payments": [
@@ -212,6 +221,13 @@
       "date": "2026-10-08",
       "note": "Maybel's surgery, paid on the Craigs' behalf",
       "payer": "ellsworth"
+    },
+    {
+      "id": "card-2026-10-21",
+      "date": "2026-10-21",
+      "payer": "craig",
+      "amount": 7052.48,
+      "note": "Kent's marina balance in full, by card (Kenect link) · WO 523845, 523952, 523987 + 2% fee"
     }
   ]
 }

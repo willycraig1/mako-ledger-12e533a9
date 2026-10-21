@@ -333,12 +333,13 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
         <li><time>Oct 1</time><p>Statement: <b class="num">$2,920.77</b> due, all of it in the 30-day column.</p></li>
         <li><time>Oct 5–7</time><p>6 ft black Power-Pole installed. Mercury gateway and NMEA backbone added so the Simrad reads fuel and engine data. WO 523987 totals <b class="num">$3,993.43</b>, with 3.25 hrs of labor not charged.</p></li>
         <li><time>Oct 10</time><p>Expected October storage draft doesn't arrive. Still not taken by Oct 21.</p></li>
+        <li><time>Oct 21</time><p>Craigs pay Kent's full marina balance by card: <b class="num">$7,052.48</b>, including a $138.28 (2%) card fee.</p></li>
       </ol>
     </section>
     <section class="card">
       <header><h2>On the horizon</h2></header>
       <ul class="horizon">
-        <li class="hot"><b>Pay down Kent's marina account</b><span>$2,920.77 from the Oct 1 statement (past 30 days) plus $3,993.43 for WO 523987. The contract allows a $50 late fee plus up to 18%/yr interest on late balances.</span></li>
+        <li><b>Itemized receipt for Oct 21</b><span>The $7,052.48 card payment is $138.28 over Kent's balance, exactly 2% of $6,914.20, so almost certainly a card fee. Paying future bills by ACH avoids it. Ask the office for the breakdown to confirm.</span></li>
         <li class="hot"><b>Horn not working</b><span>Found during the Oct 6 wiring job. The tech wasn't sure whether it was already broken. Ask the marina, since a working horn is required equipment.</span></li>
         <li><b>Analog fuel gauge is now dead</b><span>The fuel sender accepts one lead, and it now feeds the Simrad. The dash gauge wire is tied back. Fuel level reads on the Simrad only.</span></li>
         <li><b>Simrad boat speed</b><span>Probably a free settings fix: switch the field from Boat Speed to SOG.</span></li>
@@ -373,7 +374,7 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
           <label class="wide">What<input type="text" id="cTitle" required placeholder="e.g. Power-Pole install"></label>
           <label>Date<input type="date" id="cDate" required></label>
           <label>Amount ($)<input type="number" id="cAmt" step="0.01" min="0" required></label>
-          <label>Category<select id="cCat"><option value="service">Service & repairs</option><option value="storage">Storage</option><option value="insurance">Insurance</option><option value="fuel">Fuel</option><option value="upgrade">Upgrades</option><option value="gear">Gear</option><option value="other">Ice & incidentals</option><option value="nonboat">Family offset (not boat)</option></select></label>
+          <label>Category<select id="cCat"><option value="service">Service & repairs</option><option value="storage">Storage</option><option value="insurance">Insurance</option><option value="fuel">Fuel</option><option value="upgrade">Upgrades</option><option value="gear">Gear</option><option value="other">Ice & incidentals</option><option value="fees">Card & late fees</option><option value="nonboat">Family offset (not boat)</option></select></label>
           <label>Split<select id="cSplit"><option value="shared">Shared</option><option value="craig">Craigs only</option><option value="ellsworth">Ellsworths only</option></select></label>
           <label class="wide">Billed to<input type="text" id="cBilled" placeholder="e.g. Kent's marina acct"></label>
         </div>
@@ -410,7 +411,7 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
 
   const $=id=>document.getElementById(id);
   const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const CAT={storage:'Storage',service:'Service & repairs',insurance:'Insurance',fuel:'Fuel',upgrade:'Upgrades',gear:'Gear',nonboat:'Family offset (not boat)',other:'Ice & incidentals'};
+  const CAT={storage:'Storage',service:'Service & repairs',insurance:'Insurance',fuel:'Fuel',upgrade:'Upgrades',gear:'Gear',fees:'Card & late fees',nonboat:'Family offset (not boat)',other:'Ice & incidentals'};
   const SPLIT={shared:'Shared',craig:'Craigs only',ellsworth:'Ellsworths only'};
   const r2=n=>Math.round(n*100)/100;
   const money=n=>(n<-0.004?'−':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -461,30 +462,35 @@ footer{font-size:.82rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 1
     $('tOpen').textContent=money(Math.max(k.open,0));
     const aged=k.open>0.005;
     $('tOpenTile').classList.toggle('alert',aged);
-    $('tOpenSub').textContent=!aged?'Nothing outstanding.':(k.undrawn>0.005?`${money(k.open-k.undrawn)} on Kent's marina account, plus ${money(k.undrawn)} of storage the marina hasn't drafted yet. Late fees and interest can apply.`:'On Kent\'s marina account. Part of it was past 30 days on the Oct 1 statement, so late fees and interest can apply.');
+    const kentOpen=r2(k.open-k.undrawn);
+    $('tOpenSub').textContent=!aged?'Nothing outstanding.':(k.undrawn>0.005&&kentOpen<0.005?`Storage the marina hasn't drafted from the Craig account yet. Kent's marina account is paid in full.`:k.undrawn>0.005?`${money(kentOpen)} on Kent's marina account, plus ${money(k.undrawn)} of storage the marina hasn't drafted yet. Late fees and interest can apply.`:'On Kent\'s marina account. Part of it was past 30 days on the Oct 1 statement, so late fees and interest can apply.');
     const dd=S.config.drawDay||10;
     const nx=today.getDate()<dd?new Date(today.getFullYear(),today.getMonth(),dd):new Date(today.getFullYear(),today.getMonth()+1,dd);
     $('tNext').textContent=money(k.undrawn>0.005?k.undrawn:S.config.storageMonthly);
     $('tNextSub').textContent=k.undrawn>0.005?`${k.late.map(c=>MONTHS[+c.month.split('-')[1]-1]).join(' + ')} storage, overdue. Could come any day, or together with ${MONTHS[nx.getMonth()]}'s on ${MONTHS[nx.getMonth()]} ${dd}.`:`About ${MONTHS[nx.getMonth()]} ${dd} · storage ACH, Bank of America`+(S.config.pendingStatement>0.005?`. Could also include the ${money(S.config.pendingStatement)} statement balance.`:'');
 
     // family split
-    const fam=[['craig','Craigs',k.sc,k.pc,'var(--craig)'],['ellsworth','Ellsworths',k.se,k.pe,'var(--ells)']];
+    // pending storage drafts come from the Craig account automatically, so show them as Craig money already committed
+    const fam=[['craig','Craigs',k.sc,r2(k.pc+k.undrawn),'var(--craig)'],['ellsworth','Ellsworths',k.se,k.pe,'var(--ells)']];
     $('fam').innerHTML=fam.map(([key,name,share,paid,col])=>{
       const max=Math.max(k.sc,k.se,k.pc,k.pe,1);
       const pw=Math.min(paid,share)/max*100, lw=Math.max(share-paid,0)/max*100, over=Math.max(paid-share,0)/max*100;
       return `<div class="famrow">
         <div class="famhead"><span class="famname"><span class="dot" style="background:${col}"></span>${name}</span><span class="num">${money(share)} share</span></div>
         <div class="bar" style="color:${col}"><span class="paid" style="width:${pw+over}%;background:${col}"></span><span class="left" style="left:${pw+over}%;width:${lw}%"></span></div>
-        <div class="famnums"><span>Paid <b class="num">${money(paid)}</b></span><span>${share-paid>=0?'Still to put in':'Paid beyond share'} <b class="num">${money(Math.abs(share-paid))}</b></span></div>
+        <div class="famnums"><span>Paid <b class="num">${money(paid)}</b>${key==='craig'&&k.undrawn>0.005?` (incl. ${money(k.undrawn)} pending draft)`:''}</span><span>${share-paid>=0?'Still to put in':'Paid beyond share'} <b class="num">${money(Math.abs(share-paid))}</b></span></div>
       </div>`;}).join('');
     const nc=r2(k.sc-k.pc), ne=r2(k.se-k.pe);
+    // storage the marina hasn't drafted yet will come from the Craig account automatically, so count it as theirs to pay
+    const openBills=r2(k.open-k.undrawn), ncAfter=r2(nc-k.undrawn);
+    const pendingNote=k.undrawn>0.005?` Counts ${money(k.undrawn)} of storage still to be drafted from the Craig account.`:'';
     let v;
-    if(k.open>0.005){
+    if(openBills>0.005){
       v=`<strong>To clear the ${money(k.open)} still owed to the marina at a ${S.config.craigPct}/${100-S.config.craigPct} split:</strong>`+
         `<span>Craigs put in <b class="num" style="color:var(--craig)">${money(Math.max(nc,0))}</b>, Ellsworths put in <b class="num" style="color:var(--ells)">${money(Math.max(ne,0))}</b>.`+
         (nc<0?` The Ellsworths also owe the Craigs ${money(-nc)}.`:'')+(ne<0?` The Craigs also owe the Ellsworths ${money(-ne)}.`:'')+`</span>`;
-    } else if(Math.abs(nc)<0.01){ v=`<strong>All square.</strong><span>Everything is paid and the split is even.</span>`; }
-    else { v= nc>0?`<strong>Craigs owe Ellsworths ${money(nc)}</strong><span>Everything with the marina is paid.</span>`:`<strong>Ellsworths owe Craigs ${money(-nc)}</strong><span>Everything with the marina is paid.</span>`; }
+    } else if(Math.abs(ncAfter)<0.01){ v=`<strong>All square.</strong><span>Everything is paid and the split is even.${pendingNote}</span>`; }
+    else { v= ncAfter>0?`<strong>Craigs owe Ellsworths ${money(ncAfter)}</strong><span>Marina bills are paid.${pendingNote}</span>`:`<strong>Ellsworths owe Craigs <span class="num" style="color:var(--ells)">${money(-ncAfter)}</span></strong><span>Marina bills are paid.${pendingNote}</span>`; }
     $('verdict').innerHTML=v;
 
     // draws
